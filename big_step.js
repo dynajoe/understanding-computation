@@ -186,4 +186,3 @@ var sequence = new Sequence(
 
 console.log(sequence.evaluate({ }));
 console.log(statement.evaluate({ x: new Num(3) }));
-
