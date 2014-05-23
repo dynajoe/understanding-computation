@@ -103,6 +103,25 @@ extend(Choose, Pattern);
 var Repeat = function (pattern) {
    this.precedence = 2;
    this.value = pattern.bracket(2) + '*';
+
+   this.to_nfa_design = function () {
+      var nfa = pattern.to_nfa_design();
+
+      var start_state = {};
+      var accept_states = nfa.accept_states.concat(start_state);
+
+      var new_rules = nfa.rulebook.rules;
+
+      var extra_rules = nfa.accept_states.map(function (s) {
+         return new FARule(s, null, nfa.start_state);
+      });
+
+      var rules = new_rules
+         .concat(extra_rules)
+         .concat(new FARule(start_state, null, nfa.start_state));
+
+      return new NFADesign(start_state, accept_states, new NFARulebook(rules));
+   };
 };
 
 extend(Repeat, Pattern);
@@ -149,3 +168,11 @@ console.log(pattern.toString());
 console.log('a', '->', pattern.matches('a')); // true
 console.log('b', '->', pattern.matches('b')); // true
 console.log('c', '->', pattern.matches('c')); // false
+
+pattern = new Repeat(new Literal('a'));
+console.log(pattern.toString());
+console.log('', '->', pattern.matches('')); // true
+console.log('a', '->', pattern.matches('a')); // true
+console.log('aaa', '->', pattern.matches('aaa')); // true
+console.log('b', '->', pattern.matches('b')); // false
+
